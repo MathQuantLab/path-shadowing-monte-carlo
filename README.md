@@ -1,1 +1,1 @@
-# path-shadowing-monte-carlo
+# Path shadowing Monte carlo simulation
