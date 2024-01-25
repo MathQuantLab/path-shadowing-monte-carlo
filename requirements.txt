@@ -4,3 +4,7 @@ matplotlib
 jupyter
 notebook
 ipython
+scipy 
+tqdm 
+termcolor 
+torch
