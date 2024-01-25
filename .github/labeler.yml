@@ -1,0 +1,29 @@
+github:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**'
+
+vscode:
+  - changed-files:
+    - any-glob-to-any-file: '.vscode/**'
+
+config:
+  - changed-files:
+    - any-glob-to-any-file: ['.gitignore', 'requirements*', 'Article*', '*.md']
+
+release:
+  - base-branch: 'main'
+
+notebook:
+  - changed-files:
+    - any-glob-to-any-file: '*.ipynb'
+
+source:
+- all:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.py'
+    - any-glob-to-any-file: 'tests/**'
+
+tests:
+- all: 
+  - changed-files:
+    - any-glob-to-any-file: 'tests/**/*.py'
