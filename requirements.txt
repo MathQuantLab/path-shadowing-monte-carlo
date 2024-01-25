@@ -10,3 +10,5 @@ termcolor
 torch
 ipykernel
 mpire
+git+https://github.com/RudyMorel/scattering_spectra
+git+https://github.com/AiglonDore/shadowing
