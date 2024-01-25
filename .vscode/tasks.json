@@ -1,0 +1,89 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Create virtual environment",
+            "type": "shell",
+            "windows": {
+                "command": "python -m venv .venv"
+            },
+            "osx": {
+                "command": "python3 -m venv .venv"
+            },
+            "linux": {
+                "command": "python3 -m venv .venv"
+            },
+        },
+        {
+            "label": "Activate virtual environment",
+            "type": "shell",
+            "windows": {
+                "command": ".venv\\Scripts\\activate.bat"
+            },
+            "osx": {
+                "command": "source .venv/bin/activate"
+            },
+            "linux": {
+                "command": "source .venv/bin/activate"
+            },
+            "dependsOn": [
+                "Create virtual environment"
+            ],
+        },
+        {
+            "label": "Upgrade pip",
+            "type": "shell",
+            "windows": {
+                "command": "python -m pip install --upgrade pip"
+            },
+            "osx": {
+                "command": "python3 -m pip install --upgrade pip"
+            },
+            "linux": {
+                "command": "python3 -m pip install --upgrade pip"
+            },
+            "dependsOn": [
+                "Activate virtual environment"
+            ],
+        },
+        {
+            "label": "Install dependencies",
+            "type": "shell",
+            "windows": {
+                "command": "pip install -r requirements.txt"
+            },
+            "osx": {
+                "command": "pip3 install -r requirements.txt"
+            },
+            "linux": {
+                "command": "pip3 install -r requirements.txt"
+            },
+            "dependsOn": [
+                "Upgrade pip"
+            ],
+        },
+        {
+            "label": "Install dev dependencies",
+            "type": "shell",
+            "windows": {
+                "command": "pip install -r requirements-dev.txt"
+            },
+            "osx": {
+                "command": "pip3 install -r requirements-dev.txt"
+            },
+            "linux": {
+                "command": "pip3 install -r requirements-dev.txt"
+            },
+            "dependsOn": [
+                "Install dependencies"
+            ],
+        },
+        {
+            "label": "Main: Prepare environment",
+            "type": "shell",
+            "dependsOn": [
+                "Install dev dependencies"
+            ],
+        }
+    ]
+}
