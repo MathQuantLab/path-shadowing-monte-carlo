@@ -18,5 +18,12 @@ notebook:
     - any-glob-to-any-file: '*.ipynb'
 
 source:
+- all:
   - changed-files:
     - any-glob-to-any-file: '**/*.py'
+    - any-glob-to-any-file: 'tests/**'
+
+tests:
+- all: 
+  - changed-files:
+    - any-glob-to-any-file: 'tests/**/*.py'
