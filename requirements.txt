@@ -15,3 +15,4 @@ git+https://github.com/RudyMorel/shadowing
 git+https://github.com/arogozhnikov/einops
 yfinance
 asttokens
+aiohttp
