@@ -75,7 +75,8 @@ async def fetch_ticker_data(
         Returns:
             pd.DataFrame: result
         """
-        url = f"https://financial-data.shriimpe.fr/api/ticker/history/{ticker}"
+        endpoint = "quote" if quote else "history"
+        url = f"https://financial-data.shriimpe.fr/api/ticker/{endpoint}/{ticker}"
 
         if not quote:
             if start:
