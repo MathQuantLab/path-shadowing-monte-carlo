@@ -50,7 +50,7 @@ async def fetch_ticker_data(
         path = os.path.join(
             os.path.dirname(__file__),
             os.path.pardir,
-            "Data",
+            "data",
             "HistoricalPrices_SPX.pkl",
         )
         df: pd.DataFrame = pd.read_pickle(path)
