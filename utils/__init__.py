@@ -72,7 +72,6 @@ async def fetch_ticker_data(
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers={"Accept": "python/pickle"}) as response:
             if response.status != 200:
-                print(response.status)
                 raise ValueError(
                     f"Failed to fetch data from {url} with status {response.status}",
                     f"Error message: {await response.text()}",
