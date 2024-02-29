@@ -20,7 +20,7 @@ async def fetch_ticker_data(
     """Gather data from Yahoo Finance API
 
     Args:
-        ticker (str, optional): ticker. Defaults to "^GSPC".
+        tickers (str, optional): list of tickers. Defaults to "^GSPC".
         wsj (bool, optional): if True, get data from Wall Street Journal (only after 1958). Defaults to False.
         quote (bool, optional): if True, get the current quote, else historical values. Defaults to False.
         start (str | datetime, optional): start date. Defaults to None.
