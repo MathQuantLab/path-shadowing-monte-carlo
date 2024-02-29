@@ -7,7 +7,7 @@ import async_lru
 import pandas as pd
 
 
-@async_lru.alru_cache(maxsize=32, typed=False)
+@async_lru.alru_cache(maxsize=32, typed=False, ttl=3600)
 async def fetch_ticker_data(
     ticker: str = "^GSPC",
     *,
