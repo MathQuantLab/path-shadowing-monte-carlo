@@ -50,13 +50,13 @@
             "label": "Install dependencies",
             "type": "shell",
             "windows": {
-                "command": "pip install -r requirements.txt"
+                "command": "python -m pip install -r requirements.txt"
             },
             "osx": {
-                "command": "pip3 install -r requirements.txt"
+                "command": "python3 -m pip install -r requirements.txt"
             },
             "linux": {
-                "command": "pip3 install -r requirements.txt"
+                "command": "python3 -m pip install -r requirements.txt"
             },
             "dependsOn": [
                 "Upgrade pip"
@@ -66,13 +66,13 @@
             "label": "Install dev dependencies",
             "type": "shell",
             "windows": {
-                "command": "pip install -r requirements-dev.txt"
+                "command": "python -m pip install -r requirements-dev.txt"
             },
             "osx": {
-                "command": "pip3 install -r requirements-dev.txt"
+                "command": "python3 -m pip install -r requirements-dev.txt"
             },
             "linux": {
-                "command": "pip3 install -r requirements-dev.txt"
+                "command": "python3 -m pip install -r requirements-dev.txt"
             },
             "dependsOn": [
                 "Install dependencies"
@@ -84,6 +84,19 @@
             "dependsOn": [
                 "Install dev dependencies"
             ],
+        },
+        {
+            "label": "Upgrade dependencies",
+            "type": "shell",
+            "windows": {
+                "command": "python -m pip install --upgrade -r requirements.txt"
+            },
+            "osx": {
+                "command": "python3 -m pip install --upgrade -r requirements.txt"
+            },
+            "linux": {
+                "command": "python3 -m pip install --upgrade -r requirements.txt"
+            },
         }
     ]
 }

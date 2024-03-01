@@ -1,12 +1,26 @@
 import asyncio
+import functools
 import io
 import os
 from datetime import datetime
-from typing import Dict
+from typing import Any, Dict, List, Set
 
 import aiohttp
 import async_lru
 import pandas as pd
+import warnings
+import yaml
+
+
+@functools.cache
+def get_config() -> Dict[str, Any]:
+    """Reads the configuration file
+
+    Returns:
+        Dict[str, Any]: content of the file
+    """
+    with open("env.yml") as f:
+        return yaml.safe_load(f)
 
 
 @async_lru.alru_cache(maxsize=32, typed=False, ttl=3600)
@@ -16,6 +30,9 @@ async def fetch_ticker_data(
     quote: bool = False,
     start: str | datetime = None,
     end: str | datetime = None,
+    fields: List[str] | Set[str] = None,
+    limit: int = None,
+    offset: int = None,
 ) -> pd.DataFrame | Dict[str, pd.DataFrame]:
     """Gather data from Yahoo Finance API
 
@@ -25,6 +42,9 @@ async def fetch_ticker_data(
         quote (bool, optional): if True, get the current quote, else historical values. Defaults to False.
         start (str | datetime, optional): start date. Defaults to None.
         end (str | datetime, optional): end date. Defaults to None.
+        fields (List[str] | Set[str], optional): list of fields to fetch. Defaults to None.
+        limit (int, optional): limit the number of rows to fetch. Defaults to None.
+        offset (int, optional): offset the number of rows to fetch. Applied after limit. Defaults to None.
 
     Raises:
         ValueError: if Wall Street Journal data is requested for a ticker different than ^GSPC
@@ -34,6 +54,9 @@ async def fetch_ticker_data(
     Returns:
         pd.DataFrame | Dict[str, pd.DataFrame]: DataFrame with the data
     """
+    if offset > limit:
+        warnings.warn("Response will be empty")
+    
     if not quote:
         if start and isinstance(start, str):
             start = datetime.strptime(start, "%Y-%m-%d")
@@ -58,11 +81,17 @@ async def fetch_ticker_data(
             df = df[df.index >= start]
         if end:
             df = df[df.index <= end]
-        return df
+
+        df = df if not fields else df.drop(columns=set(df.columns) - set(fields))
+        
+        if limit:
+            df = df.iloc[:limit]
+        
+        return df if not offset else df.iloc[offset:]
 
     if not tickers:
         tickers = ("^GSPC",)
-        
+
     async def __process_request(ticker: str) -> pd.DataFrame:
         """Process the request to the Yahoo Finance API
 
@@ -76,29 +105,44 @@ async def fetch_ticker_data(
             pd.DataFrame: result
         """
         endpoint = "quote" if quote else "history"
-        url = f"https://financial-data.shriimpe.fr/api/ticker/{endpoint}/{ticker}"
+        url = f"{get_config()['data_endpoint']}ticker/{endpoint}/{ticker}"
 
         if not quote:
             if start:
                 url += f"?start_date={start.strftime('%Y-%m-%d')}"
             if end:
-                url += f"{'&' if '?' in url else '?'}end_date={end.strftime('%Y-%m-%d')}"
+                url += (
+                    f"{'&' if '?' in url else '?'}end_date={end.strftime('%Y-%m-%d')}"
+                )
         else:
             url += f"?start_date={datetime.today().strftime('%Y-%m-%d')}"
 
+        if fields:
+            url += f"{'&' if '?' in url else '?'}fields={','.join(fields)}"
+        
+        if limit:
+            url += f"{'&' if '?' in url else '?'}limit={limit}"
+
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers={"Accept": "python/pickle"}) as response:
+            async with session.get(
+                url, headers={"Accept": "python/pickle"}
+            ) as response:
                 if response.status != 200:
                     raise ValueError(
                         f"Failed to fetch data from {url} with status {response.status}",
                         f"Error message: {await response.text()}",
                     )
-                df = pd.read_pickle(io.BytesIO(await response.read()))
-                return df
-    
+                df: pd.DataFrame = pd.read_pickle(io.BytesIO(await response.read()))
+                return df if not offset else df.iloc[offset:]
+
     if len(tickers) == 1:
         return await __process_request(tickers[0])
     else:
-        results = await asyncio.gather(*[__process_request(ticker) for ticker in tickers])
-        return dict(zip(tickers, results))
-    
+        return dict(
+            zip(
+                tickers,
+                await asyncio.gather(
+                    *[__process_request(ticker) for ticker in tickers]
+                ),
+            )
+        )
