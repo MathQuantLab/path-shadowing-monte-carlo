@@ -62,7 +62,7 @@ async def fetch_ticker_data(
 
     if not tickers:
         tickers = ("^GSPC",)
-        
+
     async def __process_request(ticker: str) -> pd.DataFrame:
         """Process the request to the Yahoo Finance API
 
@@ -82,12 +82,16 @@ async def fetch_ticker_data(
             if start:
                 url += f"?start_date={start.strftime('%Y-%m-%d')}"
             if end:
-                url += f"{'&' if '?' in url else '?'}end_date={end.strftime('%Y-%m-%d')}"
+                url += (
+                    f"{'&' if '?' in url else '?'}end_date={end.strftime('%Y-%m-%d')}"
+                )
         else:
             url += f"?start_date={datetime.today().strftime('%Y-%m-%d')}"
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers={"Accept": "python/pickle"}) as response:
+            async with session.get(
+                url, headers={"Accept": "python/pickle"}
+            ) as response:
                 if response.status != 200:
                     raise ValueError(
                         f"Failed to fetch data from {url} with status {response.status}",
@@ -95,10 +99,15 @@ async def fetch_ticker_data(
                     )
                 df = pd.read_pickle(io.BytesIO(await response.read()))
                 return df
-    
+
     if len(tickers) == 1:
         return await __process_request(tickers[0])
     else:
-        results = await asyncio.gather(*[__process_request(ticker) for ticker in tickers])
-        return dict(zip(tickers, results))
-    
+        return dict(
+            zip(
+                tickers,
+                await asyncio.gather(
+                    *[__process_request(ticker) for ticker in tickers]
+                ),
+            )
+        )
