@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import io
 import os
 from datetime import datetime
@@ -6,7 +7,6 @@ from typing import Any, Dict
 
 import aiohttp
 import async_lru
-import functools
 import pandas as pd
 import yaml
 
