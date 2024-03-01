@@ -2,11 +2,24 @@ import asyncio
 import io
 import os
 from datetime import datetime
-from typing import Dict
+from typing import Any, Dict
 
 import aiohttp
 import async_lru
+import functools
 import pandas as pd
+import yaml
+
+
+@functools.cache
+def get_config() -> Dict[str, Any]:
+    """Reads the configuration file
+
+    Returns:
+        Dict[str, Any]: content of the file
+    """
+    with open("env.yml") as f:
+        return yaml.safe_load(f)
 
 
 @async_lru.alru_cache(maxsize=32, typed=False, ttl=3600)
@@ -76,7 +89,7 @@ async def fetch_ticker_data(
             pd.DataFrame: result
         """
         endpoint = "quote" if quote else "history"
-        url = f"https://financial-data.shriimpe.fr/api/ticker/{endpoint}/{ticker}"
+        url = f"{get_config()['data_endpoint']}ticker/{endpoint}/{ticker}"
 
         if not quote:
             if start:
