@@ -12,8 +12,8 @@ mpire
 notebook
 numpy
 pandas
-scipy 
-termcolor 
+scipy
+termcolor
 torch
-tqdm 
+tqdm
 yfinance
